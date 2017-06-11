@@ -23,8 +23,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.facebook.react.common.ApplicationHolder.getApplication;
-
 /**
  * This BroadcastReceiver receives broadcasted events from the BackgroundGeolocation plugin.
  * It's designed for you to customize in your own application, to handle events in the native
@@ -90,9 +88,9 @@ public class RNBackgroundGeolocationEventReceiver extends BroadcastReceiver impl
 
     private static ReactNativeHost reactNativeHost;
 
-    private static ReactNativeHost getReactNativeHost() {
+    private static ReactNativeHost getReactNativeHost(Context context) {
         if (reactNativeHost == null) {
-            reactNativeHost = ((ReactApplication) getApplication()).getReactNativeHost();
+            reactNativeHost = ((ReactApplication) context.getApplicationContext()).getReactNativeHost();
         }
         return reactNativeHost;
     }
@@ -146,9 +144,9 @@ public class RNBackgroundGeolocationEventReceiver extends BroadcastReceiver impl
             event.putString("name", eventName);
             event.putMap("params", params);
             HeadlessJsTaskConfig config = new HeadlessJsTaskConfig(HEADLESS_TASK_NAME, event);
-            startTask(config);
-        } else if (getReactNativeHost().hasInstance()) {
-            ReactInstanceManager reactInstanceManager = getReactNativeHost().getReactInstanceManager();
+            startTask(context, config);
+        } else if (getReactNativeHost(context).hasInstance()) {
+            ReactInstanceManager reactInstanceManager = getReactNativeHost(context).getReactInstanceManager();
             ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
             if (reactContext != null) {
                 HeadlessJsTaskContext headlessJsTaskContext = HeadlessJsTaskContext.getInstance(reactContext);
@@ -174,9 +172,9 @@ public class RNBackgroundGeolocationEventReceiver extends BroadcastReceiver impl
      *
      * @param taskConfig describes what task to start and the parameters to pass to it
      */
-    protected void startTask(final HeadlessJsTaskConfig taskConfig) {
+    protected void startTask(Context context, final HeadlessJsTaskConfig taskConfig) {
         UiThreadUtil.assertOnUiThread();
-        final ReactInstanceManager reactInstanceManager = getReactNativeHost().getReactInstanceManager();
+        final ReactInstanceManager reactInstanceManager = getReactNativeHost(context).getReactInstanceManager();
         ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
         if (reactContext == null) {
             reactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
@@ -215,5 +213,3 @@ public class RNBackgroundGeolocationEventReceiver extends BroadcastReceiver impl
     }
     */
 }
-
-
